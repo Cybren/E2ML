@@ -27,7 +27,7 @@ setuptools.setup(
         'scikit-learn~=0.24.1',
         'matplotlib~=3.3.4',
         'iteration-utilities~=0.11.0',
-        'jupyter~=1.0.0'
+        'jupyter~=1.0.0',
         'pandas~=1.3.3'
     ],
 )
