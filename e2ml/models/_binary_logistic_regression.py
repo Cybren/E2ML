@@ -98,7 +98,7 @@ class BinaryLogisticRegression(BaseEstimator, ClassifierMixin):
             y_pred = expit(np.matmul(X, w))
 
             # Compute gradient.
-            gradient = len(X)**(-1) * np.sum((y_pred - y)[:, None] * X)
+            gradient = len(X)**(-1) * np.sum((y_pred - y)[:, None] * X, axis=0)
             gradient += self.lmbda * w
             return gradient
 
