@@ -111,7 +111,6 @@ def perform_bayesian_optimization(X_cand, gpr, acquisition_func, obj_func, n_eva
     n_random_init : int
         Number of samples to be randomly acquired for initialization. Subsequently, the acquisition
         function will be used to select samples.
-
     Returns
     -------
     X_acquired : numpy.ndarray (n_evals, n_features)
@@ -131,9 +130,27 @@ def perform_bayesian_optimization(X_cand, gpr, acquisition_func, obj_func, n_eva
     check_scalar(
         n_evals, name='n_evals', target_type=int, min_val=1, max_val=len(X_cand)-1
     )
-    check_scalar(
-        n_evals, name='n_random_init', target_type=int, min_val=1, max_val=len(X_cand)-1
+    check_scalar(#typo here
+        n_random_init, name='n_random_init', target_type=int, min_val=1, max_val=len(X_cand)-1
     )
-
+   
     # Perform Bayesian optimization until `n_evals` have been performed.
-    # TODO 
+    next_idx = np.random.choice(len(X_cand), n_random_init)
+    X_acquired = X_cand[next_idx].reshape(-1,1)
+    y_acquired = obj_func(X_acquired.flatten())
+    for _ in range(n_evals):
+        gpr.fit(X_acquired, y_acquired)
+        means, stds = gpr.predict(X_cand, True)
+        if(acquisition_func == "pi"):
+            tau = max(y_acquired)
+            scores = acquisition_pi(means, stds, tau)
+        elif(acquisition_func == "ei"):
+            tau = max(y_acquired)
+            scores = acquisition_ei(means, stds, tau)
+        elif(acquisition_func == "ucb"):
+            scores = acquisition_ucb(means, stds, kappa=1.0)
+        next_idx = np.argmax(scores)
+        X_acquired = np.append(X_acquired, [X_cand[next_idx]], axis=0)
+        y_acquired = obj_func(X_acquired.flatten())
+    return X_acquired, y_acquired
+        

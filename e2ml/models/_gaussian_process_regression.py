@@ -52,7 +52,6 @@ class GaussianProcessRegression(BaseEstimator, RegressorMixin):
         # Check attributes and parameters.
         check_scalar(self.beta, min_val=0, target_type=float, name='beta')
         self.metrics_dict_ = {} if self.metrics_dict is None else self.metrics_dict
-        print(self.metrics_dict_)
         self.X_ = check_array(X)
         self.y_ = column_or_1d(y)
         check_consistent_length(self.X_, self.y_)
@@ -95,16 +94,11 @@ class GaussianProcessRegression(BaseEstimator, RegressorMixin):
         k = pairwise_kernels(X, self.X_, metric=self.metrics_dict_["metric"], gamma=self.metrics_dict_["gamma"])
 
         # Compute mean predictions `means` for samples `X`.
-        print(f"{k.shape=}")
-        print(f"{self.C_N_inv_.shape=}")
-        print(f"{self.y_.shape=}")
         means = k @ self.C_N_inv_ @ self.y_
 
         if return_std:
             # Compute standard deviations `stds` for predicted means.
             c = np.diagonal(pairwise_kernels(X, metric=self.metrics_dict_["metric"], gamma=self.metrics_dict_["gamma"]))
-            print(f"{c.shape=}")
-            print(f"{(k @ self.C_N_inv_).shape}")
             stds = c - k @ self.C_N_inv_ @ k.T
             stds = np.diag(stds)
             return means, stds
