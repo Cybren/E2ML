@@ -36,7 +36,7 @@ class StandardScaler(BaseEstimator):
         # Compute `self.mu_` containing the mean value for each feature in the training set.
         self.mu_ = np.mean(X, axis=0)
         # Compute `self.sigma_` containing the standard deviations for each feature in the training set.
-        self.sigma_ = np.std(X, axis=0)
+        self.sigma_ = np.std(X, axis=0) + 0.00001
         return self
 
     def transform(self, X):

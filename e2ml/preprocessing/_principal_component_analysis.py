@@ -58,12 +58,12 @@ class PrincipalComponentAnalysis(BaseEstimator):
         self.mu_ = np.mean(X, axis=0)
         # Compute DxD covariance matrix `S` (take mean into account).
         S = ((X - self.mu_).T @ (X - self.mu_)) / n_samples
-        print(S)
         # Compute eigenvalues `self.lmbdas_` and eigenvectors `self.U_`.
         self.lmbdas_, self.U_ =  np.linalg.eig(S)
         # Sort eigenvalues and eigenvectors in decreasing order.
-        print(self.lmbdas_)
-        print(self.U_)
+        sort_idx = np.argsort(-self.lmbdas_)
+        self.lmbdas_ = self.lmbdas_[sort_idx]
+        self.U_ = self.U_[:, sort_idx]
 
         # Determine number of selected components.
         self._determine_M()
@@ -77,7 +77,7 @@ class PrincipalComponentAnalysis(BaseEstimator):
 
         Parameters
         ----------
-        X : numpy.ndarray, sahpe (n_samples, n_features)
+        X : numpy.ndarray, shape (n_samples, n_features)
             Samples in the input space.
 
         Returns
@@ -85,7 +85,11 @@ class PrincipalComponentAnalysis(BaseEstimator):
         Z : array-like, shape (n_samples, n_components_)
             Transformed samples in the projection space.
         """
-       
+        B = self.U_[:, :self.n_components_]
+        X = np.array(X)
+        #Z = (X - self.mu_) @ B ?? see solution
+        Z = (X - self.mu_) @ B
+        return Z
 
     def inverse_transform(self, Z):
         """
@@ -102,7 +106,10 @@ class PrincipalComponentAnalysis(BaseEstimator):
         X : numpy.ndarray, sahpe (n_samples, n_features)
             Re-transformed samples in the input space.
         """
-
+        B = self.U_[:, :self.n_components_]
+        Z = np.array(Z)
+        X = Z @ B.T + self.mu_
+        return X
     def _determine_M(self):
         """
         Determine number of finally selected components.
@@ -111,12 +118,11 @@ class PrincipalComponentAnalysis(BaseEstimator):
             # If `n_components` is an integer, the number `self.n_components_` of selected dimension will
             # be reduced from `n_features` to `n_components`.
             self.n_components_ = self.n_components
-            return
         elif 0 < self.n_components < 1:
             # If `0 < n_components < 1`,  select the number `self.n_components_` of components such
             # that the amount of variance that needs to be explained is greater
             # or equal than the percentage specified by `n_components`.
-            self.n_components_ = np.min([])
-            return
+            cum_lmbdas = np.cumsum(self.lmbdas_ / np.sum(self.lmbdas_))
+            self.n_components_ = np.argmax(cum_lmbdas >= self.n_components) + 1
         else:
             raise ValueError('Invalid `n_components` parameter.')
