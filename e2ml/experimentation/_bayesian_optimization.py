@@ -60,7 +60,7 @@ def acquisition_ei(mu, sigma, tau):
     check_consistent_length(mu, sigma)
 
     # Compute and return probability improvement as `ei_scores`.
-    return (mu - tau) * norm.cdf((mu - tau) / sigma) + sigma * norm.cdf((mu - tau) / sigma)
+    return (mu - tau) * norm.cdf((mu - tau) / sigma) + sigma * norm.pdf((mu - tau) / sigma)
 
 
 def acquisition_ucb(mu, sigma, kappa):
