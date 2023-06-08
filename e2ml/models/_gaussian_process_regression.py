@@ -62,6 +62,7 @@ class GaussianProcessRegression(BaseEstimator, RegressorMixin):
         # Compute matrix `C_N` using the function `pairwise_kernels` with
         # `self.metric_dict_` as its parameters.
         k = pairwise_kernels(X, metric=self.metrics_dict_["metric"], gamma=self.metrics_dict_["gamma"])
+        #um metrics_dict zu benutzen **self.metrcicsdict
         rest = self.beta * np.eye(k.shape[0], k.shape[1])
         c = k + rest
 
@@ -98,9 +99,9 @@ class GaussianProcessRegression(BaseEstimator, RegressorMixin):
 
         if return_std:
             # Compute standard deviations `stds` for predicted means.
-            c = np.diagonal(pairwise_kernels(X, metric=self.metrics_dict_["metric"], gamma=self.metrics_dict_["gamma"]))
+            c = np.diagonal(pairwise_kernels(X, metric=self.metrics_dict_["metric"], gamma=self.metrics_dict_["gamma"])) + self.beta
             stds = c - k @ self.C_N_inv_ @ k.T
-            stds = np.diag(stds)
+            stds = np.sqrt(np.diag(stds))
             return means, stds
         else:
             return means
