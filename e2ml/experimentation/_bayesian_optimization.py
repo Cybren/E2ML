@@ -135,7 +135,7 @@ def perform_bayesian_optimization(X_cand, gpr, acquisition_func, obj_func, n_eva
     )
    
     # Perform Bayesian optimization until `n_evals` have been performed.
-    next_idx = np.random.choice(len(X_cand), n_random_init)
+    next_idx = np.random.RandomState(1).choice(len(X_cand), n_random_init)
     X_acquired = X_cand[next_idx].reshape(-1,1)
     y_acquired = obj_func(X_acquired.flatten())
     for _ in range(n_evals):

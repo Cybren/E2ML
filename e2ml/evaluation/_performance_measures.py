@@ -30,8 +30,41 @@ def confusion_matrix(y_true, y_pred, *, n_classes=None, normalize=None):
         Confusion matrix whose i-th row and j-th column entry indicates the number of amples with true label being
         i-th class and predicted label being j-th class.
     """
-    # TODO 
+    #if used with string there has to be a mapping stirng -> int
+    #n_classes x n_classes
+    if(len(y_true) != len(y_pred)):
+        raise ValueError(f"Lengths are not equal {len(y_pred)} and {len(y_true)}")
+    
+    y_type = type(y_true[0])
+    for x in y_true:
+        if(type(x) != y_type):
+            raise ValueError(f"different types in y_true: {type(x)} and {y_type}")
+    for x in y_pred:
+        if(type(x) != y_type):
+            raise ValueError(f"different types in y_pred {type(x)} and {y_type}")
+    for x in np.unique(y_true):
+        found = False
+        for y in np.unique(y_pred):
+            if(x == y):
+                found = True
+                break
+        if(not found):
+            raise ValueError(f"ranges are not the same {np.unique(y_true)} and {np.unique(y_pred)}")
+        
+        
+    classes = np.unique(y_true)
+    n_classes = len(classes)
+    cm = np.zeros((n_classes, n_classes))
+    for i, x in enumerate(classes):
+        for j, y in enumerate(classes):
+            temp = np.array([[1 if (x == actual and y == predicted) else 0 for actual in y_true] for predicted in y_pred])
+            cm[i,j] = np.sum(np.diag(temp))
+            #cm[i,j] = np.sum((y_true == i) & (y_pred==j))
+    #in der theorie auch noch die normalize sachen machen.
+    return cm
 
+
+        
 
 def accuracy(y_true, y_pred):
     """Computes the accuracy of the predicted class label `y_pred` regarding the true class labels `y_true`.
@@ -48,7 +81,11 @@ def accuracy(y_true, y_pred):
     acc : float in [0, 1]
         Accuracy.
     """
-    # TODO 
+    cm = confusion_matrix(y_true, y_pred)
+    fullsum = np.sum(cm)
+    diagsum = np.sum(np.diag(cm))
+    return diagsum / fullsum 
+    #oder 1- zero_one_loss(...) 
 
 
 def cohen_kappa(y_true, y_pred, n_classes=None):
@@ -77,6 +114,8 @@ def cohen_kappa(y_true, y_pred, n_classes=None):
     kappa : float in [-1, 1]
         The kappa statistic between -1 and 1.
     """
+    #solution
+    '''
     C = confusion_matrix(y_true=y_true, y_pred=y_pred, n_classes=n_classes)
     n_classes = len(C)
     c0 = np.sum(C, axis=0)
@@ -86,8 +125,18 @@ def cohen_kappa(y_true, y_pred, n_classes=None):
     w_mat.flat[:: n_classes + 1] = 0
     kappa = 1 - np.sum(w_mat * C) / np.sum(w_mat * expected)
     return kappa
+    '''
+    cm = confusion_matrix(y_true=y_true, y_pred=y_pred)
+    c0 = np.sum(cm, axis=0)
+    c1 = np.sum(cm, axis=1)
+    fullsum = np.sum(cm)
+    pec = 0
+    for i in range(len(c0)):
+        pec += c0[i]/fullsum + c1[i]/fullsum
+    p0 = accuracy(y_true, y_pred)
+    return (p0 - pec) / (1 - pec)
 
-
+#only for singleclass
 def macro_f1_measure(y_true, y_pred, n_classes=None):
     """Computes the marco F1 measure.
 
@@ -109,4 +158,7 @@ def macro_f1_measure(y_true, y_pred, n_classes=None):
     macro_f1 : float in [0, 1]
         The marco f1 measure between 0 and 1.
     """
-    # TODO 
+    cm = confusion_matrix(y_true, y_pred)
+    prec = cm[0,0] / (cm[0,0] + cm[1,0])
+    rec = cm[0,0] / (cm[0,0] + cm[0,1])
+    return (2 * prec * rec) / (prec  +rec)
