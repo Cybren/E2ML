@@ -32,7 +32,6 @@ class StandardScaler(BaseEstimator):
         """
         # Transform to numpy.ndarray.
         X = np.array(X, dtype=np.float64)
-        print(X)
 
         # Compute `self.mu_` containing the mean value for each feature in the training set.
         self.mu_ = np.mean(X, axis=0)  # <-- SOLUTION

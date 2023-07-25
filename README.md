@@ -57,13 +57,15 @@ jupyter-notebook
 ```
 ## Experimentation
 
-TBD
+Some prototyping in 13_final_exercise.ipynb
+Acquire Data in neq_data_pipeline.ipynb
 
 ## Evaluation
 
-TBD
+Perform hyperparameter optimization in hyperparameteroptim.ipynb
 
 ## Results
 
-TBD
+Are also given in hyperparameteroptim.ipynb
+Not as many (almost non) as time was a limiting factor for me.
 

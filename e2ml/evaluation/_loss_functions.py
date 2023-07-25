@@ -51,4 +51,4 @@ def binary_cross_entropy_loss(y_true, y_pred):
         raise ValueError("asdf")
         
     return np.mean(- xlogy(y_true, y_pred) - xlogy((1-y_true), (1-y_pred)))
-    #return np.sum(- y_true * np.log(y_pred) - (1 - y_true) * np.log(1 - y_pred))/len(y_true)
+    #return np.mean(- y_true * np.log(y_pred) - (1 - y_true) * np.log(1 - y_pred))
